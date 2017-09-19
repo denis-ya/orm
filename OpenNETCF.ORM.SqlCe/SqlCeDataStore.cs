@@ -17,6 +17,7 @@ namespace OpenNETCF.ORM
     {
         private string m_connectionString;
         private int m_maxSize = 128; // Max Database Size defaults to 128MB
+	    private int m_flushInterval = 10; // The interval time (in seconds) before all committed transactions are flushed to disk
 
         private string Password { get; set; }
 
@@ -416,13 +417,22 @@ namespace OpenNETCF.ORM
             }
         }
 
+	    public int FlushInterval
+	    {
+		    get { return m_flushInterval;  }
+		    set {
+				if (value <= 0) throw new ArgumentOutOfRangeException();
+			    m_flushInterval = value;
+		    }
+	    }
+
         public override string ConnectionString
         {
             get
             {
                 if (m_connectionString == null)
                 {
-                    m_connectionString = string.Format("Data Source={0};Persist Security Info=False;Max Database Size={1};", FileName, MaxDatabaseSizeInMB);
+                    m_connectionString = string.Format("Data Source={0};Persist Security Info=False;Max Database Size={1};Flush Interval={2};", FileName, MaxDatabaseSizeInMB, FlushInterval);
 
                     if (!string.IsNullOrEmpty(Password))
                     {
